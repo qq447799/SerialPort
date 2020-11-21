@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
-
+QT += serialport
+QT += xml
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SerialPort
@@ -25,10 +26,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    portthread.cpp \
+    portfunc.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    portthread.h \
+    headfile.h
 
 FORMS += \
         mainwindow.ui
