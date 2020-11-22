@@ -28,7 +28,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     portthread.cpp \
-    portfunc.cpp
+    portfunc.cpp \
+    mainwinfunc.cpp
 
 HEADERS += \
         mainwindow.h \

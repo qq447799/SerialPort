@@ -70,3 +70,21 @@ int PortObj::close_port(void)
     serialPort->close();
     return 10;//串口关闭成功
 }
+void PortObj::DRT_set(bool type)
+{
+    if(type == true)
+        serialPort->setDataTerminalReady(true);
+    else if(type == false)
+        serialPort->setDataTerminalReady(false);
+    else
+        serialPort->setDataTerminalReady(false);
+}
+void PortObj::RTS_set(bool type)
+{
+    if(type == true)
+        serialPort->setRequestToSend(true);
+    else if(type == false)
+        serialPort->setRequestToSend(false);
+    else
+        serialPort->setRequestToSend(false);
+}
