@@ -24,11 +24,11 @@ private:
     QSerialPort *serialPort;
 private:
     void read_data(void);
-    void send_data(void);
+    int send_data(void);
     int open_port(void);
     int close_port(void);
-    void DRT_set(bool type);
-    void RTS_set(bool type);
+    int DRT_set(bool type);
+    int RTS_set(bool type);
 };
 
 class PortInfo_Class
@@ -97,6 +97,126 @@ public:
                     return ch-'a'+10;
         //        else return (-1);
         else return ch-ch;//不在0-f范围内的会发送成0
+    }
+    QString ConvertUcharString(unsigned char *ch,int len,int flagss)
+    {
+        int i = 0;
+        unsigned char data = 0x00;
+        QString ret;
+        if(flagss == 0)
+        {
+        for(i = 0;i < len;i++)
+        {
+            data = ch[i] >> 4;//高4位转换
+            if(data <= 0x09)
+                ret[i*3] = data + 0x30;
+            else if((data >= 0x0A) && (data <= 0x0F))
+                ret[i*3] = data - 10 + 0x41;
+            else
+                ret[i*3] = 0x30;
+
+            data = ch[i] & 0x0F;//低4位转换
+            if(data <= 0x09)
+                ret[i*3+1] = data + 0x30;
+            else if((data >= 0x0A) && (data <= 0x0F))
+                ret[i*3+1] = data - 10 + 0x41;
+            else
+                ret[i*3+1] = 0x30;
+            ret[i*3+2] = 0x20;
+        }
+        }
+        else
+        {
+            for(i = 0;i < len;i++)
+            {
+                data = ch[i] >> 4;//高4位转换
+                if(data <= 0x09)
+                    ret[(len - 1 - i)*3] = data + 0x30;
+                else if((data >= 0x0A) && (data <= 0x0F))
+                    ret[(len - 1 - i)*3] = data - 10 + 0x41;
+                else
+                    ret[(len - 1 - i)*3] = 0x30;
+
+                data = ch[i] & 0x0F;//低4位转换
+                if(data <= 0x09)
+                    ret[(len - 1 - i)*3+1] = data + 0x30;
+                else if((data >= 0x0A) && (data <= 0x0F))
+                    ret[(len - 1 - i)*3+1] = data - 10 + 0x41;
+                else
+                    ret[(len - 1 - i)*3+1] = 0x30;
+                ret[(len - 1 - i)*3+2] = 0x20;
+            }
+        }
+        return ret;
+    }
+    QString HexStrToFloatStr(QString str,int flagss)
+    {
+        int i = 0,j = 0;
+         char tmp = 0;
+        float dataf = 0.0;
+        unsigned char data[4] = {0x00};
+        QString ret = " ",tmpstr;
+        j = str.length();
+        for(i = 0;i < j;i++)
+        {
+            if(str.at(i) != ' ')
+              tmpstr += str.at(i);
+
+        }
+        if(flagss == 0)
+        {
+        for(i = 0;i < 4;i++)
+        {
+            tmp = tmpstr[i * 2].toLatin1();//高4位转换
+            if((tmp >= '0') && (tmp <= '9'))
+                 data[i] = (tmp-0x30) << 4;  // 0x30 对应 ‘0’
+            else if((tmp >= 'A') && (tmp <= 'F'))
+                  data[i] = (tmp-'A'+10) << 4;
+            else if((tmp >= 'a') && (tmp <= 'f'))
+                  data[i] = (tmp-'a'+10) << 4;
+            else
+                return ret;
+            tmp = tmpstr[i * 2 + 1].toLatin1();//低4位转换
+            if((tmp >= '0') && (tmp <= '9'))
+                 data[i] |= tmp-0x30;  // 0x30 对应 ‘0’
+            else if((tmp >= 'A') && (tmp <= 'F'))
+                  data[i] |= tmp-'A'+10;
+            else if((tmp >= 'a') && (tmp <= 'f'))
+                  data[i] |= tmp-'a'+10;
+            else
+                return ret;
+
+        }
+        }
+        else
+        {
+            for(i = 0;i < 4;i++)
+            {
+                tmp = tmpstr[(3 - i) * 2].toLatin1();//高4位转换
+                if((tmp >= '0') && (tmp <= '9'))
+                     data[i] = (tmp-0x30) << 4;  // 0x30 对应 ‘0’
+                else if((tmp >= 'A') && (tmp <= 'F'))
+                      data[i] = (tmp-'A'+10) << 4;
+                else if((tmp >= 'a') && (tmp <= 'f'))
+                      data[i] = (tmp-'a'+10) << 4;
+                else
+                    return ret;
+                tmp = tmpstr[(3 - i) * 2 + 1].toLatin1();//低4位转换
+                if((tmp >= '0') && (tmp <= '9'))
+                     data[i] |= tmp-0x30;  // 0x30 对应 ‘0’
+                else if((tmp >= 'A') && (tmp <= 'F'))
+                      data[i] |= tmp-'A'+10;
+                else if((tmp >= 'a') && (tmp <= 'f'))
+                      data[i] |= tmp-'a'+10;
+                else
+                    return ret;
+            }
+
+        }
+        memcpy(&dataf,data,4);
+        //dataf = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+        ret = QString("%1").arg(dataf);
+        return ret;
     }
 };
 #endif // PORTTHREAD_H

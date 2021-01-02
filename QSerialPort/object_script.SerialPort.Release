@@ -1,0 +1,15 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\portthread.o
+./release\portfunc.o
+./release\mainwinfunc.o
+./release\filethread.o
+./release\subwin_check.o
+./release\subwin_cnt_std.o
+./release\moc_mainwindow.o
+./release\moc_portthread.o
+./release\moc_filethread.o
+./release\moc_subwin_check.o
+./release\moc_subwin_cnt_std.o
+);

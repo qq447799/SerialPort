@@ -1,0 +1,20 @@
+#include "cnt_std.h"
+#include "ui_cnt_std.h"
+
+cnt_std::cnt_std(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::cnt_std)
+{
+    ui->setupUi(this);
+    uiadditem();
+}
+
+cnt_std::~cnt_std()
+{
+    delete ui;
+}
+void cnt_std::uiadditem(void)
+{
+    ui->gridLayout->addItem(ui->textBrowser_guocheng,1,1,4,2);
+    ui->gridLayout->addItem(ui->textBrowser_jieguo,2,1,4,2);
+}

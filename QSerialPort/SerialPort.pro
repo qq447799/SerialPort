@@ -29,12 +29,20 @@ SOURCES += \
         mainwindow.cpp \
     portthread.cpp \
     portfunc.cpp \
-    mainwinfunc.cpp
+    mainwinfunc.cpp \
+    filethread.cpp \
+    subwin_check.cpp \
+    subwin_cnt_std.cpp
 
 HEADERS += \
         mainwindow.h \
     portthread.h \
-    headfile.h
+    headfile.h \
+    filethread.h \
+    subwin_check.h \
+    subwin_cnt_std.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    subwin_check.ui \
+    subwin_cnt_std.ui

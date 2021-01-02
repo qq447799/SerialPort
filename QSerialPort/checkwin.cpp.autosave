@@ -1,0 +1,14 @@
+#include "subwin_check.h"
+#include "ui_checkwin.h"
+
+checkwin::checkwin(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::checkwin)
+{
+    ui->setupUi(this);
+}
+
+checkwin::~checkwin()
+{
+    delete ui;
+}

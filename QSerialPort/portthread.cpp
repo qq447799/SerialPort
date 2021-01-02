@@ -5,6 +5,7 @@ StringChange_Class ExChange;
 extern Buf_Class ShowBuf;
 extern QString SendBuf;
 extern QMutex Mutex_Show;
+
 extern Flag_Class Flags;
 extern QByteArray SendHexBuf;
 
@@ -28,61 +29,69 @@ void PortObj::p_portinfo_slot(int Type)
 {
     int ret = 0;
     switch (Type) {
-    case 1://打开串口
+    case OPENPORT://打开串口
         ret = open_port();
-        emit p_portinfo_sig(ret);
         break;
-    case 11://关闭串口
+    case CLOSEPORT://关闭串口
         ret = close_port();
-        emit p_portinfo_sig(ret);
         break;
-    case 13://发送数据
-        send_data();
+    case SENDDATA://发送数据
+        ret = send_data();
         break;
-    case 14://DTR选择
-        DRT_set(true);
+    case DTRSET://DTR选择
+        ret = DRT_set(true);
         break;
-    case 15://DTR取消
-        DRT_set(false);
+    case DTRCANCEL://DTR取消
+        ret = DRT_set(false);
         break;
-    case 16://RTS选择
-        RTS_set(true);
+    case RTSSET://RTS选择
+        ret = RTS_set(true);
         break;
-    case 17://RTS取消
-        RTS_set(false);
+    case RTSCANCEL://RTS取消
+        ret = RTS_set(false);
         break;
     default:
-        ret = 9;//未知错误
-        emit p_portinfo_sig(ret);
+        ret = UNKNOWERR;//未知错误
         break;
     }
 
+    if(ret)
+        emit p_portinfo_sig(ret);
 }
 void PortObj::read_data(void)
 {
     if(Timing == false)
     {
         Timing = true;
-        mstimer->start(20);
+        mstimer->start(10);
     }
 }
 void PortObj::timer_read_slot(void)
 {
     QByteArray  RecvBuf;
     QString TmpStr;
-    int len = 0,i = 0;
+    int i = 0,len = 0;
+
+    Timing = false;
+    mstimer->stop();
 
     RecvBuf = serialPort->readAll();
-    if(RecvBuf.length() < 1)
+    len = RecvBuf.length();
+    if(len < 1)
         return;
-    if(Flags.hex == true)
+    if(Flags.encode == HEXCODE)
     {
         TmpStr = ExChange.ByteArrayToHexStr(RecvBuf);
         ShowBuf.str[ShowBuf.wp] = TmpStr;
     }
-    else
+    else if(Flags.encode == TUF8CODE)
     {
         ShowBuf.str[ShowBuf.wp] = QString::fromLocal8Bit(RecvBuf);
+    }
+    else
+    {
+        for(i = 0;i < len;i++)
+            ShowBuf.str[ShowBuf.wp][i] = RecvBuf[i];
     }
 
     Mutex_Show.lock();
@@ -91,25 +100,40 @@ void PortObj::timer_read_slot(void)
     if(++ShowBuf.num > MAXBUFNUM)
         ShowBuf.num = MAXBUFNUM;
     Mutex_Show.unlock();
-    emit p_portinfo_sig(12);
+    emit p_portinfo_sig(SHOWDATA);
 }
 
-void PortObj::send_data(void)
+int PortObj::send_data(void)
 {
+    QByteArray senddata;
     if(serialPort->isOpen())
     {
-        if(Flags.hex == false)
-        {
-            QByteArray senddata = SendBuf.toUtf8();
-
-            senddata += 0x0D;
+        switch (Flags.encode) {
+        case ASCIICODE:
+            senddata = SendBuf.toUtf8();
+            if(Flags.enter == true)
+                senddata += 0x0D;
             serialPort->write(senddata);
-        }
-        else
+            break;
+        case HEXCODE:
+            if(Flags.enter == true)
+                SendHexBuf += 0x0D;
             serialPort->write(SendHexBuf);
+            break;
+        case TUF8CODE:
+            senddata = SendBuf.toUtf8();
+            if(Flags.enter == true)
+                senddata += 0x0D;
+            serialPort->write(senddata);
+            break;
+        default:
+            break;
+        }
     }
     else
-        emit p_portinfo_sig(18);
+        return PORTNOTOPEN;
+
+    return 0;
 }
 
 

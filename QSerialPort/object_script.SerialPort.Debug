@@ -1,0 +1,15 @@
+INPUT(
+./debug\main.o
+./debug\mainwindow.o
+./debug\portthread.o
+./debug\portfunc.o
+./debug\mainwinfunc.o
+./debug\filethread.o
+./debug\subwin_check.o
+./debug\subwin_cnt_std.o
+./debug\moc_mainwindow.o
+./debug\moc_portthread.o
+./debug\moc_filethread.o
+./debug\moc_subwin_check.o
+./debug\moc_subwin_cnt_std.o
+);
